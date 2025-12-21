@@ -46,7 +46,7 @@
 - 변수에 값을 할당할 때는 할당 연산자 `=` 사용
 - 값의 할당은 소스코드가 순차적으로 실행되는 시점인 런타임에 실행
 
-```
+```javascript
 console.log(score); // undefined
 
 // 1. 변수 선언
@@ -84,7 +84,7 @@ console.log(score); // 80
 - 파스칼 케이스 - 생성자 함수, 클래스명에 사용
 - 헝가리언 케이스
 
-```
+```javascript
 // 카멜
 var firstName;
 // 스네이크

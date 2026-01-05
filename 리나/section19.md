@@ -126,3 +126,152 @@ console.log(circle2.getArea()); // 12.56~
 
 - `constructor` 프로퍼티는 `prototype` 프로퍼티로 자신을 참조하고 있는 생성자 함수를 가리킴
 - 이 연결은 생성자 함수가 생성될 때 이뤄짐
+
+---
+
+### 프로토타입의 생성 시점
+
+- 생성자 함수가 생성되는 시점에 더불어 생성됨
+- 프로토타입과 생성자 함수는 단독으로 존재할 수 없고 쌍으로 존재
+
+#### 사용자 정의 생성자 함수
+
+- 생성자 함수로서 호출할 수 있는 함수
+- 함수 정의가 평가되어 함수 객체를 생성하는 시점에 프로토타입도 더불어 생성
+- 생성된 프로토타입은 오직 `constructor` 프로퍼티만을 갖는 객체
+
+#### 빌트인 생성자 함수
+
+- 빌트인 생성자 함수가 생성되는 시점에 프로토타입 생성
+- 객체가 생성되기 이전에 생성자 함수와 프로토타입은 이미 객체화 되어 존재
+
+---
+
+### 객체 생성 방식
+
+- 객체 리터럴
+
+```js
+const obj = { x: 1 };
+```
+
+- `Object` 생성자 함수
+
+```js
+const obj = new Object();
+obj.x = 1;
+```
+
+- 생성자 함수
+
+```js
+function Person(name) {
+  this.name = name;
+}
+
+const me = new Person("Lee");
+```
+
+- `Object.create` 메서드
+- 클래스
+
+---
+
+### 프로토타입 체인
+
+- 객체의 프로퍼티나 메서드에 접근할 때, 해당 객체에 없으면 `[[Prototype]]` 참조를 따라 부모 프로토타입을 순차적으로 검색
+- 모든 프로토타입 체인의 끝은 언제나 `Object.prototype`이며, 이곳의 프로토타입은 `null`
+- 프로토타입 체인은 상속과 프로퍼티 검색을 위한 것
+
+---
+
+### 오버라이딩과 프로퍼티 섀도잉
+
+- `오버라이딩` : 상위 클래스가 가지고 있는 메서드를 하위 클래스가 재정의하여 사용하는 방식
+- `프로퍼티 섀도잉` : 인스턴스에 프로토타입과 동일한 이름의 메서드를 추가하면, 프로토타입 메서드가 가려지는 현상
+- 프로토타입 프로퍼티를 변경 또는 삭제하려면 하위 객체를 통해 프로토타입 체인으로 접근하는 것이 아니라 프로토타입에 직접 접근해야 함
+
+---
+
+### instanceof 연산자
+
+- `instanceof`: 객체의 프로토타입 체인 상에 특정 생성자 함수의 prototype 객체가 존재하는지 확인
+- `Object.create`: 명시적으로 프로토타입을 지정하여 객체를 생성
+  - null을 인자로 주어 종점이 없는 객체 생성도 가능
+- `정적(Static) 멤버`: 생성자 함수 자체에 추가한 메서드/프로퍼티로, 인스턴스로는 호출할 수 없고 오직 생성자 함수로만 접근 가능
+
+---
+
+### 프로퍼티 존재 확인
+
+- `in` 연산자
+
+  - 객체 내에 특정 프로퍼티가 존재하는지 여부 확인
+  - 프로토타입 체인 상에 존재하는 모든 프로토타입에서 프로퍼티 검색
+
+  ```js
+  const person = {
+    name: "Lee",
+    address: "Seoul",
+  };
+
+  // person 객체에 name 프로퍼티가 존재한다.
+  console.log("name" in person); // true
+  // person 객체에 address 프로퍼티가 존재한다.
+  console.log("address" in person); // true
+  // person 객체에 age 프로퍼티가 존재하지 않는다.
+  console.log("age" in person); // false
+  ```
+
+- `Object.prototype.hasOwnProperty` 메서드
+  - 객체에 특정 프로퍼티가 존재하는지 확인 가능
+  - 인수로 전달받은 프로퍼티 키가 객체 고유의 프로퍼티 키인 경우에만 `true`를 반환
+  - 상속받은 프로토타입의 프로퍼티인 경우 `false`를 반환
+
+---
+
+### 프로퍼티 열거
+
+- `for..in` 문
+
+  - 객체의 모든 프로퍼티를 순회하며 열거 시 사용
+  - 프로퍼티 어트리뷰트 `[[Enumerable]]`의 값이 `true`인 프로퍼티를 순회하며 열거
+
+  ```js
+  const person = {
+    name: "Lee",
+    address: "Seoul",
+    __proto__: { age: 20 },
+  };
+
+  for (const key in person) {
+    // 객체 자신의 프로퍼티인지 확인한다.
+    if (!person.hasOwnProperty(key)) continue;
+    console.log(key + ": " + person[key]);
+  }
+  // name: Lee
+  // address: Seoul
+  ```
+
+- `Object.keys/values/entries` 메서드
+
+  - 객체 자신을 열거 가능한 프로퍼티 키와 값을 배열로 반환
+  - S8에서 도입된 `Object.entries` 메서드는 객체 자신의 열거 가능한 키와 값의 쌍의 배열을 반환
+
+  ```js
+  const person = {
+    name: "Lee",
+    address: "Seoul",
+    __proto__: { age: 20 },
+  };
+
+  console.log(Object.keys(person)); // ["name", "address"]
+  console.log(Object.values(person)); // ["Lee", "Seoul"]
+  console.log(Object.entries(person)); // [["name", "Lee"], ["address", "Seoul"]]
+
+  Object.entries(person).forEach(([key, value]) => console.log(key, value));
+  /*
+  name Lee
+  address Seoul
+  */
+  ```
